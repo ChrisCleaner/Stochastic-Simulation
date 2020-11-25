@@ -8,9 +8,10 @@ import simpy
 import random
 from numpy.random import choice
 import numpy as np
+from random import choice
 
 class Server(object):
-    def __init__(self, env, lamb, mu, n_servers, n_clients, sorting = "FIFO"):
+    def __init__(self, env, lamb, mu, n_servers, n_clients, sorting = "FIFO", distribution_input = "M", distribution_time_in_server = "M"):
         self.env = env
         # Start the run process everytime an instance is created.
         #Capacity is the amount of servers n, standard Queue is FIFO
@@ -18,6 +19,8 @@ class Server(object):
         self.lamb = lamb
         self.n_servers = n_servers
         self.n_clients = n_clients
+        self.distribution_input = distribution_input
+        self.distribution_time_in_server = distribution_time_in_server
         self.sorting = sorting
         if sorting == "FIFO":
             self.server = simpy.Resource(env, capacity=n_servers)
@@ -41,12 +44,38 @@ class Server(object):
         #print('lambd', lamb)
         for i in range(self.n_clients):
             #mu is 1/(handle duration) = 1/5 , the amount of time it takes a server to handle one load
-            time_in_server = random.expovariate(mu)
+            
+            #decide which distribution is chosen and set time in server
+            if self.distribution_time_in_server == "M":
+                time_in_server = random.expovariate(mu)
+            elif self.distribution_time_in_server[0] == "D":
+                time_in_server = int(self.distribution_time_in_server[1:])
+            elif self.distribution_time_in_server == "Assigned": #75% exponential 1, 25% exponential 5
+                if random.random() < 0.75:
+                    time_in_server = random.expovariate(1)
+                else:
+                    time_in_server = random.expovariate(1/5)
+            else:
+                time_in_server = random.lognormvariate(0,1)
+                    
+                    
+                
             c = self.client(env, 'Client%02d' % self.start, server, time_in_server)
             env.process(c)
             
             #the time at which a client arrives is exponentially distributed with Lambda
-            t = random.expovariate(lamb)
+            if self.distribution_input == "M":
+                t = random.expovariate(lamb)
+            elif self.distribution_input[0] == "D": 
+                t = int(self.distribution_input[1:])
+            elif self.distribution_input == "Assigned":
+                if random.random() < 0.75:
+                    t = random.expovariate(1)
+                else:
+                    t = random.expovariate(1/5)
+                
+            else:
+                t = random.lognormvariate(0,1)
             yield env.timeout(t)
             self.start += 1 
         

@@ -24,27 +24,30 @@ import pandas as pd
 import xlsxwriter
 
 
-N = 100
+N = 10
 mu = 10
+lambd = 8
 
-n_clients = 2000
+n_clients = 200
 sorting_method = "Priority"
+in_distribution = "Assigned"
+serv_distribution = "Assigned"
+
 
 
 def main():
-  
+    global lambd
     #run with 1 server with lambda = 10
-    lambd = 8
     n_servers = 1
     print('Run with %i server(s) with lambda = %i' % (n_servers, lambd))
     wait_times1 = multiple_simulations( lambd, n_servers, sorting_method)
     
-    lambd = 16
+    lambd = lambd*2
     n_servers = 2
     print('Run with %i server(s) with lambda = %i' % (n_servers, lambd))
     wait_times2 = multiple_simulations(lambd, n_servers, sorting_method)
     
-    lambd = 24
+    lambd = lambd*2
     n_servers = 4
     print('Run with %i server(s) with lambda = %i' % (n_servers, lambd))
     wait_times3 = multiple_simulations(lambd, n_servers, sorting_method)
@@ -80,7 +83,7 @@ def multiple_simulations(lambd, n_servers, sorting_method):
         #initialise environment
         env = simpy.Environment()
         #start processing
-        processing = Server(env, lambd, mu, n_servers, n_clients, sorting_method)
+        processing = Server(env, lambd, mu, n_servers, n_clients, sorting_method, in_distribution, serv_distribution)
         env.run()
         #print('clients helped', processing.start)
         times.append(np.mean(processing.waiting_times[int(500):]))
