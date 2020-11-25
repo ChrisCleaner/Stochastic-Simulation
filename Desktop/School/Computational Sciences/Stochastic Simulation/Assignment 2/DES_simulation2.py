@@ -49,7 +49,7 @@ class Server(object):
             if self.distribution_time_in_server == "M":
                 time_in_server = random.expovariate(mu)
             elif self.distribution_time_in_server[0] == "D":
-                time_in_server = int(self.distribution_time_in_server[1:])
+                time_in_server = float(self.distribution_time_in_server[1:])
             elif self.distribution_time_in_server == "Assigned": #75% exponential 1, 25% exponential 5
                 if random.random() < 0.75:
                     time_in_server = random.expovariate(1)
@@ -67,7 +67,7 @@ class Server(object):
             if self.distribution_input == "M":
                 t = random.expovariate(lamb)
             elif self.distribution_input[0] == "D": 
-                t = int(self.distribution_input[1:])
+                t = float(self.distribution_input[1:])
             elif self.distribution_input == "Assigned":
                 if random.random() < 0.75:
                     t = random.expovariate(1)

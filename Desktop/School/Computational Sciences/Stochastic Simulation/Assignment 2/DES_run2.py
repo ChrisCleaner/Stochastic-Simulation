@@ -19,49 +19,54 @@ sys.path.append(os.getcwd().replace("\\","/"))
 
 from DES_simulation2 import Server
 
-location = (os.getcwd().replace("\\","/") + f"/results{random.random()}.csv")
+
 import pandas as pd
 import xlsxwriter
 
 
-N = 10
+N = 2
 mu = 10
 lambd = 8
 
 n_clients = 200
-sorting_method = "Priority"
+sorting_method = "FIFO"
 in_distribution = "Assigned"
 serv_distribution = "Assigned"
-
-
+       
 
 def main():
-    global lambd
-    #run with 1 server with lambda = 10
-    n_servers = 1
-    print('Run with %i server(s) with lambda = %i' % (n_servers, lambd))
-    wait_times1 = multiple_simulations( lambd, n_servers, sorting_method)
     
-    lambd = lambd*2
-    n_servers = 2
-    print('Run with %i server(s) with lambda = %i' % (n_servers, lambd))
-    wait_times2 = multiple_simulations(lambd, n_servers, sorting_method)
-    
-    lambd = lambd*2
-    n_servers = 4
-    print('Run with %i server(s) with lambda = %i' % (n_servers, lambd))
-    wait_times3 = multiple_simulations(lambd, n_servers, sorting_method)
-    
-    
-    
-    df1 = pd.DataFrame({'times': wait_times1, 'servers': [1 for i in range(len(wait_times1))]})
-    df2 = pd.DataFrame({'times': wait_times2, 'servers': [2 for i in range(len(wait_times2))]})
-    df4 = pd.DataFrame({'times': wait_times3, 'servers': [4 for i in range(len(wait_times3))]})
-    
-    df = df1.append(df2)
-    df = df.append(df4)
-    
-    write_to_csv( df)
+    for lambd in [9, 9.5, 9.9, 9.99999]:
+        for sort_method in ["FIFO", "Priority"]:
+            for serv_distribution in ["M", "D0.1", "Assigned", "Else"]:
+                        #run with 1 server with lambda = 10
+                    new_lambd = lambd
+                    location = (os.getcwd().replace("\\","/") + f"/Result Folder/results {lambd, sort_method, serv_distribution}.csv")
+                    n_servers = 1
+                    print('Run with %i server(s) with lambda = %i' % (n_servers, new_lambd))
+                    wait_times1 = multiple_simulations( new_lambd, n_servers, sorting_method)
+                    print(wait_times1)
+                    new_lambd = lambd*2
+                    n_servers = 2
+                    print('Run with %i server(s) with lambda = %i' % (n_servers, new_lambd))
+                    wait_times2 = multiple_simulations(new_lambd, n_servers, sorting_method)
+                    
+                    new_lambd = new_lambd*2
+                    n_servers = 4
+                    print('Run with %i server(s) with lambda = %i' % (n_servers, new_lambd))
+                    wait_times3 = multiple_simulations(new_lambd, n_servers, sorting_method)
+                    
+                    
+                    
+                    df1 = pd.DataFrame({'times': wait_times1, 'servers': [1 for i in range(len(wait_times1))]})
+                    df2 = pd.DataFrame({'times': wait_times2, 'servers': [2 for i in range(len(wait_times2))]})
+                    df4 = pd.DataFrame({'times': wait_times3, 'servers': [4 for i in range(len(wait_times3))]})
+                    
+                    df = df1.append(df2)
+                    df = df.append(df4)
+                    
+             
+                    write_to_csv(df,location)
     
 
 def multiple_simulations(lambd, n_servers, sorting_method):
@@ -91,7 +96,7 @@ def multiple_simulations(lambd, n_servers, sorting_method):
 
 
 
-def write_to_csv(data):
+def write_to_csv(data,location):
    
     data.to_csv(location, index = False)
     
