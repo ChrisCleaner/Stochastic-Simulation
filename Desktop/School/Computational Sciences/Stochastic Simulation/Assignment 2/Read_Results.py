@@ -29,20 +29,20 @@ def main():
     df3 = pd.read_csv(location3)
     
     read(df)
-    
-    df.loc[df['servers'] == 1][df['lambda'] == 9.1]
-    
+
 def read(df):
     dfs = {}
     for lambd in [9.1, 9.3, 9.5, 9.7, 9.9, 9.99]:
         for serv in [1,2,4]:
-            df1 = df.loc[df['servers'] == serv][df['lambda'] == lambd]
+            df1 = df.loc[df['servers'] == serv]
+            df1 = df1.loc[df1['lambda'] == lambd]
             dfs['{}+{}'.format(lambd, serv)] = df1
             
             
     print(len(dfs['9.3+2']))
       
-    dfs['9.1+4']
+    print(dfs['9.1+4'])
+    
     
     
     
@@ -115,3 +115,9 @@ def extra(df):
     print(stats.normaltest(df3['times']))
     
     
+    
+
+    
+
+if __name__ == '__main__':
+    main()
