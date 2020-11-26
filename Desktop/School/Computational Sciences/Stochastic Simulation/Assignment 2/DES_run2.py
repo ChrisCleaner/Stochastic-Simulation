@@ -24,14 +24,14 @@ import pandas as pd
 import xlsxwriter
 
 
-N = 2
+N = 1000
 mu = 10
 lambd = 8
 
-n_clients = 200
+n_clients = 5000
 sorting_method = "FIFO"
 in_distribution = "Assigned"
-serv_distribution = "Assigned"
+
        
 
 def main():
@@ -44,17 +44,17 @@ def main():
                     location = (os.getcwd().replace("\\","/") + f"/Result Folder/results {lambd, sort_method, serv_distribution}.csv")
                     n_servers = 1
                     print('Run with %i server(s) with lambda = %i' % (n_servers, new_lambd))
-                    wait_times1 = multiple_simulations( new_lambd, n_servers, sorting_method)
-                    print(wait_times1)
+                    wait_times1 = multiple_simulations( new_lambd, n_servers, sort_method, serv_distribution)
+                    
                     new_lambd = lambd*2
                     n_servers = 2
                     print('Run with %i server(s) with lambda = %i' % (n_servers, new_lambd))
-                    wait_times2 = multiple_simulations(new_lambd, n_servers, sorting_method)
+                    wait_times2 = multiple_simulations(new_lambd, n_servers, sort_method, serv_distribution)
                     
                     new_lambd = new_lambd*2
                     n_servers = 4
                     print('Run with %i server(s) with lambda = %i' % (n_servers, new_lambd))
-                    wait_times3 = multiple_simulations(new_lambd, n_servers, sorting_method)
+                    wait_times3 = multiple_simulations(new_lambd, n_servers, sort_method, serv_distribution)
                     
                     
                     
@@ -64,12 +64,11 @@ def main():
                     
                     df = df1.append(df2)
                     df = df.append(df4)
-                    
-             
-                    write_to_csv(df,location)
+                    print(lambd, sort_method, serv_distribution,wait_times3)
+                    write_to_csv( df, location)
     
 
-def multiple_simulations(lambd, n_servers, sorting_method):
+def multiple_simulations(lambd, n_servers, sorting_method, serv_distribution):
     """
     Runs N DES  of class Server with the Simpy environment and takes as input:
     lambd = lambda, rate at which clietns arrive

@@ -8,7 +8,7 @@ import simpy
 import random
 from numpy.random import choice
 import numpy as np
-from random import choice
+
 
 class Server(object):
     def __init__(self, env, lamb, mu, n_servers, n_clients, sorting = "FIFO", distribution_input = "M", distribution_time_in_server = "M"):
@@ -47,25 +47,25 @@ class Server(object):
             
             #decide which distribution is chosen and set time in server
             if self.distribution_time_in_server == "M":
-                time_in_server = random.expovariate(mu)
+                time_in_server = random.expovariate(self.mu)
             elif self.distribution_time_in_server[0] == "D":
                 time_in_server = float(self.distribution_time_in_server[1:])
             elif self.distribution_time_in_server == "Assigned": #75% exponential 1, 25% exponential 5
                 if random.random() < 0.75:
-                    time_in_server = random.expovariate(1)
+                    time_in_server = random.expovariate(10)
                 else:
-                    time_in_server = random.expovariate(1/5)
+                    time_in_server = random.expovariate(2)
             else:
                 time_in_server = random.lognormvariate(0,1)
                     
                     
-                
+#                
             c = self.client(env, 'Client%02d' % self.start, server, time_in_server)
             env.process(c)
             
             #the time at which a client arrives is exponentially distributed with Lambda
             if self.distribution_input == "M":
-                t = random.expovariate(lamb)
+                t = random.expovariate(self.lamb)
             elif self.distribution_input[0] == "D": 
                 t = float(self.distribution_input[1:])
             elif self.distribution_input == "Assigned":
@@ -76,6 +76,8 @@ class Server(object):
                 
             else:
                 t = random.lognormvariate(0,1)
+                
+                
             yield env.timeout(t)
             self.start += 1 
         
@@ -103,7 +105,7 @@ class Server(object):
                 #print("%s Waited %d" % (name, wait))
                 
                 #calculating the time the client spent in the server, is exponentially distributed with rate mu 
-                tis = random.expovariate(time_in_server)
+                tis = time_in_server
                 self.server_times.append(tis)
                 yield env.timeout(tis)
                 #print("%s Finished %d" % (name, env.now))
