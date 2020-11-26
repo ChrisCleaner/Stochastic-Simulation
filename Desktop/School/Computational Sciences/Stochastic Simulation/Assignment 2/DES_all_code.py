@@ -10,23 +10,24 @@ from numpy.random import choice
 import numpy as np
 import sys 
 from scipy import stats
+import os
 
 
 
-sys.path.append(r'C:\Users\Gebruiker\OneDrive\Computational_Science\Year1_Semester1_Block2\Stochastic_Simulations\Assignment2')
+#sys.path.append(r'C:\Users\Gebruiker\OneDrive\Computational_Science\Year1_Semester1_Block2\Stochastic_Simulations\Assignment2')
 
-from DES_simulation2 import Server
+#from DES_simulation2 import Server
 
-location = (r'C:\Users\Gebruiker\OneDrive\Computational_Science\Year1_Semester1_Block2\Stochastic_Simulations\Assignment2\DES_results2.csv')
+location = os.getcwd().replace("\\","/") + "/results2.csv" #(r'C:\Users\Gebruiker\OneDrive\Computational_Science\Year1_Semester1_Block2\Stochastic_Simulations\Assignment2\DES_results2.csv')
 
 import pandas as pd
 import xlsxwriter
 
 
-N = 500
+N = 1
 mu = 10
 
-n_clients = 20000
+n_clients = 20
 
 
 def main():
@@ -81,7 +82,8 @@ def multiple_simulations(lambd, n_servers):
         processing = Server(env, lambd, mu, n_servers, n_clients)
         env.run()
         #print('clients helped', processing.start)
-        times.append(np.mean(processing.waiting_times[int(1000):]))
+        times.append(np.mean(processing.waiting_times[int(0):]))
+        print(processing.server_times)
     return times
 
 
@@ -121,7 +123,8 @@ class Server(object):
         #print('lambd', lamb)
         for i in range(self.n_clients):
             #mu is 1/(handle duration) = 1/5 , the amount of time it takes a server to handle one load
-            c = self.client(env, 'Client%02d' % self.start, server, time_in_server=mu)
+            time_in_server = random.expovariate(mu)
+            c = self.client(env, 'Client%02d' % self.start, server, time_in_server)
             env.process(c)
             
             #the time at which a client arrives is exponentially distributed with Lambda
@@ -152,7 +155,7 @@ class Server(object):
             #print("%s Waited %d" % (name, wait))
             
             #calculating the time the client spent in the server, is exponentially distributed with rate mu 
-            tis = random.expovariate(time_in_server)
+            tis = time_in_server
             self.server_times.append(tis)
             yield env.timeout(tis)
             #print("%s Finished %d" % (name, env.now))
